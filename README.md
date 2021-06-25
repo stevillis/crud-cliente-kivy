@@ -4,7 +4,7 @@ Uma aplicação para Cadastro de Clientes utilizando Kivy
 
 # Instalação de dependências
 
-Para instalar as dependências do projeto, é necessário navegar até a pasta do projeto e executar o comando:
+Para instalar as dependências do projeto, é necessário navegar até a pasta do projeto e executar o comando:<br>
 $ pip install -r requirements.txt
 
 # Conectando ao Banco de Dados
