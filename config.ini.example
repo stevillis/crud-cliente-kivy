@@ -1,0 +1,7 @@
+[DATABASE]
+user=user
+passwd=password
+db=database_name
+host=_host
+port=port
+autocommit=False
