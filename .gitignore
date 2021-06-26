@@ -134,3 +134,4 @@ dmypy.json
 /.idea/misc.xml
 /.idea/crud-cliente-kivy.iml
 /config.ini
+/gui/teste/
