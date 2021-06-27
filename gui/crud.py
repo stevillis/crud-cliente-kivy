@@ -1,9 +1,15 @@
 from kivy.app import App
+from kivy.properties import partial
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.popup import Popup
 from kivy.uix.togglebutton import ToggleButton
 
 from entity.cliente import Cliente
 from repository.cliente_repositorio import ClienteRepositorio
+
+
+class ExclusaoPopup(Popup):
+    pass
 
 
 class BotaoListagem(ToggleButton):
@@ -56,9 +62,13 @@ class Principal(BoxLayout):
     def cliente_selecionado(self, id):
         Principal.id_cliente = id
 
+    def remover(self, id):
+        ClienteRepositorio.remover_cliente(id)
+        self.listar_clientes()
+
     def editar_cliente(self):
         try:
-            id = Principal().id_cliente
+            id = Principal.id_cliente
 
             nome = self.ids.nome.text
             idade = int(self.ids.idade.text)
@@ -72,6 +82,22 @@ class Principal(BoxLayout):
         except ValueError as ve:
             self.ids.box_layout_erro.height = "40dp"
             self.ids.label_erro.text = f"Erro: {ve}"
+
+    def remover_cliente(self):
+        id = Principal.id_cliente
+
+        try:
+            if int(id) > 0:
+                popup = ExclusaoPopup()
+                popup.title = "Excluir Cliente"
+                popup.funcao = partial(self.remover, id)
+                popup.open()
+            else:
+                self.ids.box_layout_erro.height = "40dp"
+                self.ids.label_erro.text = f"Atenção: Selecione um Cliente antes de remover!"
+        except TypeError as te:
+            self.ids.box_layout_erro.height = "40dp"
+            self.ids.label_erro.text = f"Erro: {te}"
 
 
 class Crud(App):
