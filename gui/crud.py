@@ -1,11 +1,18 @@
 from kivy.app import App
 from kivy.properties import partial
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.togglebutton import ToggleButton
 
 from entity.cliente import Cliente
 from repository.cliente_repositorio import ClienteRepositorio
+
+
+class MensagemPopup(Popup):
+    def __init__(self, **kwargs):
+        super(MensagemPopup, self).__init__(**kwargs)
+        self.title = 'Campos não preenchidos'
 
 
 class ExclusaoPopup(Popup):
@@ -33,31 +40,41 @@ class Principal(BoxLayout):
         self.listar_clientes()
 
     def cadastrar_cliente(self):
-        try:
-            nome = self.ids.nome.text
-            idade = int(self.ids.idade.text)
+        if self.ids.nome.text == '' or self.ids.idade.text == '':
+            MensagemPopup().open()
+        else:
+            try:
+                nome = self.ids.nome.text
+                idade = int(self.ids.idade.text)
 
-            cliente = Cliente(nome, idade)
-            ClienteRepositorio.inserir_cliente(cliente)
-            self.listar_clientes()
+                cliente = Cliente(nome, idade)
+                ClienteRepositorio.inserir_cliente(cliente)
+                self.listar_clientes()
 
-            self.ids.nome.text = ''
-            self.ids.idade.text = ''
+                self.ids.nome.text = ''
+                self.ids.idade.text = ''
 
-            self.ids.box_layout_erro.height = "0dp"
-            self.ids.label_erro.text = ""
-        except ValueError as ve:
-            self.ids.box_layout_erro.height = "40dp"
-            self.ids.label_erro.text = f"Erro: {ve}"
+                self.ids.box_layout_erro.height = "0dp"
+                self.ids.label_erro.text = ""
+            except ValueError as ve:
+                self.ids.box_layout_erro.height = "40dp"
+                self.ids.label_erro.text = f"Erro: {ve}"
 
     def listar_clientes(self):
         self.ids.clientes.clear_widgets()
         clientes = ClienteRepositorio.listar_clientes()
-        for i in clientes:
-            id = str(i[0])
-            nome = i[1]
-            idade = str(i[2])
-            self.ids.clientes.add_widget(BotaoListagem(id, nome, idade))
+
+        if len(clientes) == 0:
+            boxlayout = BoxLayout(size_hint_y=None)
+            label = Label(text="Nenhum Cliente cadastrado ainda...", halign="center", valign="middle")
+            boxlayout.add_widget(label)
+            self.ids.clientes.add_widget(boxlayout)
+        else:
+            for i in clientes:
+                id = str(i[0])
+                nome = i[1]
+                idade = str(i[2])
+                self.ids.clientes.add_widget(BotaoListagem(id, nome, idade))
 
     def cliente_selecionado(self, id):
         Principal.id_cliente = id
@@ -67,21 +84,27 @@ class Principal(BoxLayout):
         self.listar_clientes()
 
     def editar_cliente(self):
-        try:
-            id = Principal.id_cliente
+        if self.ids.nome.text == '' or self.ids.idade.text == '':
+            MensagemPopup().open()
+        else:
+            try:
+                id = Principal.id_cliente
 
-            nome = self.ids.nome.text
-            idade = int(self.ids.idade.text)
+                nome = self.ids.nome.text
+                idade = int(self.ids.idade.text)
 
-            cliente = Cliente(nome, idade)
-            ClienteRepositorio.editar_cliente(id, cliente)
-            self.listar_clientes()
+                cliente = Cliente(nome, idade)
+                ClienteRepositorio.editar_cliente(id, cliente)
+                self.listar_clientes()
 
-            self.ids.nome.text = ''
-            self.ids.idade.text = ''
-        except ValueError as ve:
-            self.ids.box_layout_erro.height = "40dp"
-            self.ids.label_erro.text = f"Erro: {ve}"
+                self.ids.nome.text = ''
+                self.ids.idade.text = ''
+
+                self.ids.box_layout_erro.height = "0dp"
+                self.ids.label_erro.text = ""
+            except ValueError as ve:
+                self.ids.box_layout_erro.height = "40dp"
+                self.ids.label_erro.text = f"Erro: {ve}"
 
     def remover_cliente(self):
         id = Principal.id_cliente
@@ -102,6 +125,7 @@ class Principal(BoxLayout):
 
 class Crud(App):
     def build(self):
+        self.title = 'CRUD de Cliente'
         return Principal()
 
 
