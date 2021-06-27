@@ -15,8 +15,13 @@ class BotaoListagem(ToggleButton):
         self.text = self.nome_cliente + " " + self.idade_cliente
         self.group = 'clientes'
 
+    def _do_release(self, *args):
+        Principal().cliente_selecionado(self.id_cliente)
+
 
 class Principal(BoxLayout):
+    id_cliente = 0
+
     def __init__(self, **kwargs):
         super(Principal, self).__init__(**kwargs)
         self.listar_clientes()
@@ -35,8 +40,6 @@ class Principal(BoxLayout):
 
             self.ids.box_layout_erro.height = "0dp"
             self.ids.label_erro.text = ""
-
-
         except ValueError as ve:
             self.ids.box_layout_erro.height = "40dp"
             self.ids.label_erro.text = f"Erro: {ve}"
@@ -49,6 +52,26 @@ class Principal(BoxLayout):
             nome = i[1]
             idade = str(i[2])
             self.ids.clientes.add_widget(BotaoListagem(id, nome, idade))
+
+    def cliente_selecionado(self, id):
+        Principal.id_cliente = id
+
+    def editar_cliente(self):
+        try:
+            id = Principal().id_cliente
+
+            nome = self.ids.nome.text
+            idade = int(self.ids.idade.text)
+
+            cliente = Cliente(nome, idade)
+            ClienteRepositorio.editar_cliente(id, cliente)
+            self.listar_clientes()
+
+            self.ids.nome.text = ''
+            self.ids.idade.text = ''
+        except ValueError as ve:
+            self.ids.box_layout_erro.height = "40dp"
+            self.ids.label_erro.text = f"Erro: {ve}"
 
 
 class Crud(App):
