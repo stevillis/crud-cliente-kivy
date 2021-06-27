@@ -25,7 +25,7 @@ class BotaoListagem(ToggleButton):
         self.id_cliente = cliente_id
         self.nome_cliente = cliente_nome
         self.idade_cliente = cliente_idade
-        self.text = self.nome_cliente + " " + self.idade_cliente
+        self.text = self.nome_cliente + " | " + self.idade_cliente
         self.group = 'clientes'
 
     def _do_release(self, *args):
@@ -44,7 +44,7 @@ class Principal(BoxLayout):
             MensagemPopup().open()
         else:
             try:
-                nome = self.ids.nome.text
+                nome = self.ids.nome.text.strip()
                 idade = int(self.ids.idade.text)
 
                 cliente = Cliente(nome, idade)
@@ -90,7 +90,7 @@ class Principal(BoxLayout):
             try:
                 id = Principal.id_cliente
 
-                nome = self.ids.nome.text
+                nome = self.ids.nome.text.strip()
                 idade = int(self.ids.idade.text)
 
                 cliente = Cliente(nome, idade)
@@ -127,6 +127,3 @@ class Crud(App):
     def build(self):
         self.title = 'CRUD de Cliente'
         return Principal()
-
-
-Crud().run()
